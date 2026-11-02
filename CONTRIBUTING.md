@@ -16,6 +16,12 @@ hub server runs it, and everything the engine's own logic needs from hardware, t
 
 ## Development setup
 
+For this fork's recorded-video experiment, I run
+`uv run pytest tests/test_regions.py tests/test_engine.py` to check region
+coverage, boundary preservation and existing engine behavior. Replay commands
+and measurement limits are in the
+[architecture guide](docs/architecture.md#offline-overlapping-region-experiment-in-this-fork).
+
 ```bash
 uv sync                              # Python engine + hub server
 uv run printguard                    # hub on :8000 (MediaMTX is bundled into the image. For video in dev, brew install mediamtx, 1.19.0 or newer, and set MEDIAMTX_BINARY=$(which mediamtx))

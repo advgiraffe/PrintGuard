@@ -1,3 +1,7 @@
+> Experimental fork: I am evaluating overlapping camera regions on recorded
+> video. See [the offline replay workflow](docs/architecture.md#offline-overlapping-region-experiment-in-this-fork).
+> Live monitoring behavior is unchanged.
+
 <div align="center">
 
 # PrintGuard

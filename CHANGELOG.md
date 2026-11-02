@@ -7,6 +7,12 @@ release notes.
 The format is [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased fork experiment]
+
+### Added
+
+- I added an offline recorded-video comparison of the saved crop, center view and overlapping regions, including edge coverage, per-region scores and processing times. Live monitoring behavior stays unchanged.
+
 ## [2.6.4] - 2026-10-27
 
 ### Added

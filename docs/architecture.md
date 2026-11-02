@@ -30,6 +30,54 @@ vendor's client library are the exception, covered under
 
 ## The shape of it
 
+### Offline overlapping-region experiment in this fork
+
+I use `python -m printguard.server.region_replay` to compare recorded camera
+frames with the existing model before changing live monitoring. The command
+decodes each selected frame once and compares the saved camera crop, the
+uncropped center view, and overlapping square regions. It uses local model and
+video files and writes JSON results. It creates no hub, printer connection or
+automatic response.
+
+`engine/regions.py` plans the regions and extracts their images without I/O.
+The existing `vision.preprocess` stays unchanged. A 320-pixel square retains a
+280-pixel center after preprocessing; a 192-pixel square retains 168 pixels.
+The planner overlaps those retained centers and replicates boundary pixels
+outside the source frame so the real edges survive preprocessing. At 640x360
+these defaults produce six and fifteen regions, respectively. Boundary padding
+is part of the experiment and may affect scores.
+
+```bash
+uv run python -m printguard.server.region_replay \
+  --recording /path/to/print-segments \
+  --models /path/to/models \
+  --transform /path/to/camera-transform.json \
+  --output /path/to/results --provider cpu
+```
+
+The recording directory contains chronologically named MP4 segments. The model
+directory contains `encoder_float32.onnx`, `metadata.json` and `prototypes.json`.
+The transform JSON uses the camera's `rotation`, `crop`, `brightness`, `contrast`
+and `sharpness` fields. `--provider cuda` requires an installed CUDA-capable ONNX
+Runtime and fails if CUDA is unavailable. This fork does not change runtime
+dependencies or the live platform's provider selection.
+
+`--stride 10` samples every tenth frame except `--dense-tail 2`, which decodes
+and scores every frame of the final two segments. `--dense-tail 0` disables that
+exception. Optional `--labels` accepts a reviewed manifest with `session_id`
+matching the recording directory name and `examples` containing `segment`,
+`frame_index_zero_based`, `selected` and `proposed_label`. Selected labelled
+frames are always included. Each frame row records the source PTS, separate
+region scores and their maximum. The summary reports actual coverage, timing,
+threshold crossings and owner-labelled counts.
+
+Maximum-score aggregation is an experiment, not a calibrated probability or a
+live pause decision. More regions can increase false alerts. Compare complete
+print groups, retain uncertain labels, and measure normal-print false alarms
+as well as missed failures. The live scheduler, camera registration, monitors,
+watchdog and printer controls are unchanged. A later live implementation needs
+one response decision for the printer rather than independent tile monitors.
+
 ```mermaid
 flowchart LR
     subgraph transports["Transports (no logic of their own)"]
